@@ -1,0 +1,27 @@
+{
+  "name": "dynd.js",
+  "version": "0.0.1",
+  "description": "DynDNS Update Daemon",
+  "main": "dynd.js",
+  "dependencies": {
+    "daemon": "~1.1.0",
+    "node-uuid": "~1.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Xophmeister/dynd.js.git"
+  },
+  "keywords": [
+    "dyndns",
+    "daemon",
+    "dns",
+    "dyn"
+  ],
+  "author": "Christopher Harrison",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "a92ba6c19045a265f7666aba5dc0a720c29a36d1"
+}

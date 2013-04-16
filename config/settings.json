@@ -1,0 +1,6 @@
+{
+  'secure':    true,
+  'interface': null,
+  'lookup':    true,
+  'refresh':   60
+}
