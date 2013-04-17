@@ -1,6 +1,7 @@
 {
-  'secure':    true,
-  'interface': null,
-  'lookup':    true,
-  'refresh':   60
+  'secure':  true,
+  'network': null,
+  'lookup':  true,
+  'refresh': 60,
+  'log':     'all'
 }

@@ -5,11 +5,11 @@
   "main": "dynd.js",
   "dependencies": {
     "daemon": "~1.1.0",
-    "node-uuid": "~1.4.0"
+    "node-uuid": "~1.4.0",
+    "netmask": "0.0.2"
   },
   "devDependencies": {},
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git://github.com/Xophmeister/dynd.js.git"
