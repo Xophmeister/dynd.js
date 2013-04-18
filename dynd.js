@@ -6,7 +6,12 @@ var config = require('./lib/configure')
 config.on('ready', function() {
   var emitter = require('events').EventEmitter,
       util    = require('util'),
-      every   = require('./lib/every');
+      every   = require('./lib/every'),
+      log     = require('./lib/logger')(config.settings.log);
+
+  // Daemonise
+  // TODO
+  log('all', 'Daemon started with PID ' + process.pid);
 
   // Setup IP address resolver
   var resolve = require('./lib/resolve')(config);
@@ -15,35 +20,28 @@ config.on('ready', function() {
   var dyndns = require('./lib/dyndns')(config);
   
   dyndns.on('complete', function() {
-    // TODO
-    // Completion handler
+    log('all', 'DynDNS update cycle completed.');
 
   }).on('success', function(status) {
-    // TODO
-    // Success handler
+    log('dyn', 'DynDNS: ' + status);
 
-  }).on('error', function(status) {
-    // TODO
-    // Error handler
-
+  }).on('error', function(status, fatal) {
+    log('fail', 'DynDNS: ' + status);
+    if (fatal) { scheduler.stop(); }
   });
 
   // This is basically an event aggregator
   var ipAggregator = function() {
-    var me = this;
-
-    this.local = null;
-    this.host  = null;
+    var me    = this,
+        addrs = { local: null, host: null };
 
     this.update = function(type) {
       return function(ip) {
-        me[type] = ip;
+        addrs[type] = ip;
 
-        if (me.local && me.host) {
-
-          if (me.local != me.host) {
-            me.emit('change', me.local);
-
+        if (addrs.local && addrs.host) {
+          if (addrs.local != addrs.host) {
+            me.emit('change', addrs.local);
           } else {
             me.emit('noop');
           }
@@ -56,23 +54,22 @@ config.on('ready', function() {
   util.inherits(ipAggregator, emitter);
 
   // Schedule
-  every(config.settings.refresh).on('tick', function() {
+  var scheduler = every(config.settings.refresh).on('tick', function() {
+    log('all', 'Scheduled check initialised...');
+
     // Setup IP comparator
     // This triggers the update :)
     var comparator = new ipAggregator();
 
     comparator.on('change', function(ip) {
-      // TODO
+      log('all', 'DynDNS update initialised...');
       dyndns.update(ip);
 
     }).on('noop', function() {
-      // TODO
-      // Do nothing
+      log('all', 'No update required.');
 
     }).on('fail', function() {
-      // TODO
-      // Error handler
-
+      log('fail', 'Could not resolve external IP address. Cannot update DynDNS.');
     });
 
     // Setup IP resolver listeners
@@ -83,5 +80,10 @@ config.on('ready', function() {
     
     // Resolve IPs
     resolve.getAll();
+
+  }).on('stop', function() {
+    // Scheduler forcibly stopped => Fatal error :(
+    log('fail', 'Fatal error! Shutting down daemon...');
+    process.exit(1);
   });
 });
